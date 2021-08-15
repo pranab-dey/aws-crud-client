@@ -16,6 +16,7 @@ import { IconContext } from 'react-icons';
 function App() {
 	const [allUsers, setAllUsers] = useState();
 	const [toggle, setToggle] = useState(false);
+	const [edit, setEdit] = useState();
 
 	const [user, setUser] = useState({
 		firstname: '',
@@ -35,6 +36,17 @@ function App() {
 		);
 		setUser({ firstname: '', lastname: '', email: '', password: '' });
 	};
+
+	const handleUpdate = async (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		const response = await axios.patch(
+			'https://js9290dnvf.execute-api.ap-southeast-1.amazonaws.com/prod/user',
+			JSON.stringify(user)
+		);
+		setToggle(false);
+	};
+
 	const handleUsers = async () => {
 		const response = await axios.get(
 			'https://js9290dnvf.execute-api.ap-southeast-1.amazonaws.com/prod/users'
@@ -43,10 +55,12 @@ function App() {
 		setAllUsers(response.data.users);
 		setToggle(true);
 	};
+
 	const handleEdit = (e, user) => {
 		e.preventDefault();
 		e.stopPropagation();
 		setToggle(false);
+		setEdit(true);
 		console.log('user', user);
 		setUser({
 			firstname: user.firstname,
@@ -69,9 +83,13 @@ function App() {
 		const response = await axios.delete(
 			'https://js9290dnvf.execute-api.ap-southeast-1.amazonaws.com/prod/user',
 			{
-				userId: user.userId,
+				userId: user.userId.toString(),
 			}
 		);
+		console.log(response);
+		// console.log('id', user.userId.toString());
+		// console.log(typeof user.userId);
+
 		const filteredUsers = allUsers.filter(
 			(item) => item.userId !== user.userId
 		);
@@ -81,6 +99,7 @@ function App() {
 		e.preventDefault();
 		e.stopPropagation();
 		setToggle(false);
+		setEdit(false);
 
 		setUser({ firstname: '', lastname: '', email: '', password: '' });
 	};
@@ -236,9 +255,9 @@ function App() {
 								<Button
 									variant='outline-info'
 									type='submit'
-									onClick={handleSubmit}
+									onClick={edit ? handleUpdate : handleSubmit}
 									className='intro__button'>
-									Submit
+									{edit ? 'Update' : 'Submit'}
 								</Button>
 							</Row>
 						</Form>
