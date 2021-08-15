@@ -16,6 +16,10 @@ import { IconContext } from 'react-icons';
 function App() {
 	const [allUsers, setAllUsers] = useState();
 	const [toggle, setToggle] = useState(false);
+	const [updateKey, setUpdateKey] = useState();
+	const [updateValue, setUpdateValue] = useState();
+	const [userId, setUserId] = useState('');
+
 	const [edit, setEdit] = useState();
 
 	const [user, setUser] = useState({
@@ -40,10 +44,16 @@ function App() {
 	const handleUpdate = async (e) => {
 		e.preventDefault();
 		e.stopPropagation();
+		const data = {
+			userId: userId.toString(),
+			updateKey: updateKey,
+			updateValue: updateValue,
+		};
 		const response = await axios.patch(
 			'https://js9290dnvf.execute-api.ap-southeast-1.amazonaws.com/prod/user',
-			JSON.stringify(user)
+			JSON.stringify(data)
 		);
+		console.log('data:', data);
 		setToggle(false);
 	};
 
@@ -61,6 +71,7 @@ function App() {
 		e.stopPropagation();
 		setToggle(false);
 		setEdit(true);
+		setUserId(user.userId);
 		console.log('user', user);
 		setUser({
 			firstname: user.firstname,
@@ -76,17 +87,19 @@ function App() {
 			...prevState,
 			[e.target.name]: e.target.value,
 		}));
+		setUpdateKey(e.target.name);
+		setUpdateValue(e.target.value);
 	};
 	const handleDelete = async (e, user) => {
 		e.stopPropagation();
 		e.preventDefault();
-		const response = await axios.delete(
-			'https://js9290dnvf.execute-api.ap-southeast-1.amazonaws.com/prod/user',
-			{
-				userId: user.userId.toString(),
-			}
-		);
-		console.log(response);
+		// const response = await axios.delete(
+		// 	'https://js9290dnvf.execute-api.ap-southeast-1.amazonaws.com/prod/user',
+		// 	{
+		// 		userId: user.userId.toString(),
+		// 	}
+		// );
+		// console.log(response);
 		// console.log('id', user.userId.toString());
 		// console.log(typeof user.userId);
 
@@ -123,7 +136,7 @@ function App() {
 				{/* start 1st Part */}
 				{toggle ? (
 					<div>
-						<Table striped bordered hover variant='dark'>
+						<Table striped bordered hover>
 							<thead>
 								<tr>
 									<th>#</th>
@@ -265,7 +278,9 @@ function App() {
 				)}
 				{/* end Second Part */}
 			</div>
-			{JSON.stringify(user)}
+			{/* {JSON.stringify(user)} */}
+			{/* {JSON.stringify(updateKey)} */}
+			{/* {JSON.stringify(updateValue)} */}
 		</div>
 	);
 }
